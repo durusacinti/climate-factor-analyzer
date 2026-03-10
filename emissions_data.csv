@@ -1,0 +1,21 @@
+ticker,company,sector,scope1_tonnes,scope2_tonnes,source,year,notes
+TSLA,Tesla,Auto,211000,466000,Tesla 2023 Impact Report (third-party assured),2023,Scope 2 location-based
+F,Ford,Auto,1800000,900000,Ford CDP Climate Disclosure 2023 / Integrated Sustainability Report,2023,Scope 1+2 reduced 35% since 2017
+GM,General Motors,Auto,4100000,2100000,GM 2023 Sustainability Report,2023,Includes all global manufacturing
+TM,Toyota,Auto,5800000,2900000,Toyota Environmental Report 2023,2023,Global operations incl. manufacturing
+STLA,Stellantis,Auto,1900000,1100000,Stellantis 2023 Sustainability Report,2023,Post-merger combined footprint
+XOM,ExxonMobil,Oil & Gas,92000000,7000000,ExxonMobil 2023 Advancing Climate Solutions Report (ISO 14064-3 assured),2023,Operated assets basis; equity basis ~111Mt total
+CVX,Chevron,Oil & Gas,37000000,3000000,Chevron 2023 Sustainability Performance Data (operated basis),2023,Upstream 17Mt + downstream 20Mt Scope 1
+COP,ConocoPhillips,Oil & Gas,17000000,1500000,ConocoPhillips 2023 Sustainability Report,2023,Operated assets
+BP,BP,Oil & Gas,42000000,4500000,BP 2023 Sustainability Report,2023,Operated basis
+SHEL,Shell,Oil & Gas,68000000,5500000,Shell 2023 Sustainability Report,2023,Operated basis
+NEE,NextEra Energy,Utilities,22000000,1200000,NextEra Energy 2023 ESG Report,2023,Includes FPL and NEER segments
+DUK,Duke Energy,Utilities,48000000,2100000,Duke Energy 2023 ESG Report,2023,Primarily coal/gas generation
+SO,Southern Company,Utilities,38000000,1800000,Southern Company 2023 ESG Report,2023,
+D,Dominion Energy,Utilities,19000000,900000,Dominion Energy 2023 ESG Report,2023,Post-asset-sale portfolio
+AEP,American Electric Power,Utilities,56000000,2400000,AEP 2023 Corporate Responsibility Report,2023,Heavy coal generation exposure
+MSFT,Microsoft,Technology,280000,0,Microsoft 2023 Environmental Sustainability Report,2023,Scope 2 = 0 (100% renewable matched); Scope 2 location-based is ~3.5Mt
+GOOGL,Alphabet,Technology,320000,0,Alphabet 2023 ESG Report,2023,Scope 2 market-based 0 (carbon-free energy matching)
+AAPL,Apple,Technology,180000,0,Apple 2023 Environmental Progress Report,2023,Apple operations 100% renewable since 2018
+META,Meta,Technology,190000,0,Meta 2023 Sustainability Report,2023,Net zero operations via RECs
+AMZN,Amazon,Technology,9800000,3200000,Amazon 2023 Sustainability Report,2023,Logistics fleet dominates; largest tech emitter by far
