@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python3 analysis.py)",
-      "Bash(python3 -c \":*)"
-    ]
-  }
-}
