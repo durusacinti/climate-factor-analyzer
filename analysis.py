@@ -4,16 +4,16 @@ Climate Factor Analyzer — Core Analysis Engine v3.0
 IFRS S2 (ISSB)-aligned climate risk assessment with peer-relative z-score benchmarking.
 
 Data architecture:
-  - Scope 1+2: Real reported emissions from company sustainability reports (2023)
+  - Scope 1+2: Reported emissions from company sustainability reports (2023)
     Used for: IFRS S2 (ISSB) disclosure comparison, peer z-scores (apples-to-apples)
   - Scope 1+2+3: S1+2 * sector multiplier (CDP 2023 Supply Chain Report)
     Used for: Climate VaR, full financial risk exposure, stranded asset signal
   - Scope 2 note: Tech companies report market-based Scope 2 = 0 (RECs/PPAs).
-    Location-based estimates included separately for honest grid impact assessment.
+    Location-based estimates included separately for grid impact assessment.
 
 Frameworks referenced:
   # TCFD was disbanded October 2023; recommendations fully absorbed into IFRS S2 (ISSB),
-  # effective January 2024. Institutional standard adopted by BlackRock, MSCI, global AMs.
+  # effective January 2024. Institutional standard adopted by has been adopted by major institutional investors.
   # Reference: https://www.ifrs.org/sustainability/tcfd/
   - IFRS S2 (ISSB) — Climate-related Disclosures (effective January 2024)
   - IEA Net Zero by 2050 (NZE2050) carbon price pathways
@@ -31,8 +31,8 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime
 
-# Suppress yfinance's own HTTP error logging (404s for invalid tickers, etc.)
-# These are harmless but flood stderr during demos. CRITICAL keeps only hard crashes.
+# yfinance prints 404 errors to terminal for invalid tickers,
+# which are harmless but look bad during a demo. CRITICAL keeps only hard crashes.
 logging.getLogger('yfinance').setLevel(logging.CRITICAL)
 
 
@@ -872,11 +872,14 @@ def calculate_climate_factors(ticker: str) -> dict:
     climate_var = calculate_climate_var(intensity_s12, revenue_bn, sector_group or 'default', scope3_mult)
 
     # Fossil exposure
-    if green_rev > 75 or intensity_s12 < 5:     fossil_exp = 'Minimal'
-    elif intensity_s12 < 20 or green_rev > 50:   fossil_exp = 'Low'
-    elif sector == 'Energy':                      fossil_exp = 'High'
-    elif intensity_s12 >= 150:                    fossil_exp = 'Medium'
-    else:                                         fossil_exp = 'Low'
+    # Utilities override: high grid-combustion intensity → Medium regardless of green revenue.
+    # Green revenue reflects future direction but doesn't eliminate current fossil combustion.
+    if sector == 'Utilities' and intensity_s12 > 500:  fossil_exp = 'Medium'
+    elif green_rev > 75 or intensity_s12 < 5:          fossil_exp = 'Minimal'
+    elif intensity_s12 < 20 or green_rev > 50:         fossil_exp = 'Low'
+    elif sector == 'Energy':                            fossil_exp = 'High'
+    elif intensity_s12 >= 150:                         fossil_exp = 'Medium'
+    else:                                              fossil_exp = 'Low'
 
     # Stranded asset signal
     nz_var = climate_var['net_zero_1_5c']['scope12_var_pct']
@@ -962,7 +965,7 @@ def _print_report(f: dict):
         print(f"  ├─ Scope 2 (market) : {f['scope2_tonnes']:>15,.0f} tCO2e/yr")
         if f['scope2_location_based']:
             print(f"  ├─ Scope 2 (location): {f['scope2_location_based']:>14,.0f} tCO2e/yr  [grid before RECs]")
-    print(f"  ├─ S1+2 Intensity   : {f['intensity_s12']:>10.2f} tCO2e/$M revenue")
+    print(f"  ├─ Scope 1+2 Intensity: {f['intensity_s12']:>10.2f} tCO2e/$M revenue")
     print(f"  ├─ Scope 3 Mult     : {f['scope3_multiplier']}x")
     print(f"  ├─ Green Revenue    : {f['green_revenue_pct']}%  |  Fossil Exposure: {f['fossil_exposure']}")
     print(f"  └─ Source: {f['emissions_source']} ({f['emissions_year']})")

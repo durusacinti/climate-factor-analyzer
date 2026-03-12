@@ -9,6 +9,7 @@ st.set_page_config(page_title="Climate Factor Analyzer", page_icon="🌍", layou
 # ── Styling ──────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+[data-testid="stMetricValue"] { font-size: 1.1rem; }
 .risk-badge { padding:4px 12px; border-radius:12px; font-weight:600; font-size:0.85rem; }
 .badge-red   { background:#fee2e2; color:#991b1b; }
 .badge-orange{ background:#ffedd5; color:#9a3412; }
@@ -93,7 +94,7 @@ with tab1:
             # ── Row 1: Key metrics ────────────────────────────────────────────
             st.subheader("📊 Key Climate Metrics")
             m1, m2, m3, m4, m5 = st.columns(5)
-            m1.metric("S1+2 Intensity",
+            m1.metric("Scope 1+2 Intensity",
                       f"{f['intensity_s12']:.1f} tCO2/$M",
                       help="Scope 1+2 carbon intensity per $M revenue. Lower = less carbon per dollar earned.")
             m2.metric("Green Revenue", f"{f['green_revenue_pct']}%",
@@ -126,7 +127,7 @@ with tab1:
 
                 if f['scope1_tonnes']:
                     em_data = {
-                        'Metric': ['Scope 1', 'Scope 2 (market-based)', 'S1+2 Total', 'S1+2 Intensity'],
+                        'Metric': ['Scope 1', 'Scope 2 (market-based)', 'Scope 1+2 Total', 'Scope 1+2 Intensity'],
                         'Value': [
                             f"{f['scope1_tonnes']:,.0f} tCO2e",
                             f"{f['scope2_tonnes']:,.0f} tCO2e",
@@ -139,7 +140,7 @@ with tab1:
                         em_data['Value'].insert(2, f"{f['scope2_location_based']:,.0f} tCO2e ⚠️")
                     st.table(pd.DataFrame(em_data))
                 else:
-                    st.info(f"S1+2 Intensity (proxy): **{f['intensity_s12']:.1f} tCO2/$M**")
+                    st.info(f"Scope 1+2 Intensity (proxy): **{f['intensity_s12']:.1f} tCO2/$M**")
 
                 st.markdown(f"<p class='source-note'>Source: {f['emissions_source']} ({f['emissions_year']})</p>",
                             unsafe_allow_html=True)
@@ -292,7 +293,7 @@ with tab1:
         - CDP Scope 3 multipliers
 
         **Metrics:**
-        - **S1+2 Intensity**: Scope 1+2 CO2e / $M revenue
+        - **Scope 1+2 Intensity**: Scope 1+2 CO2e / $M revenue
         - **Climate VaR**: % EBIT at risk from carbon pricing
         - **Z-Score**: Intensity vs sector peers (same scope basis)
         - **Paris Alignment**: vs SBTi 2030 sector budgets
@@ -351,11 +352,11 @@ with tab2:
             nz_b = _fmt_nz_display(fb)
             comp = {
                 'Metric': [
-                    'Sector', 'S1+2 Intensity (tCO2/$M)',
+                    'Sector', 'Scope 1+2 Intensity (tCO2/$M)',
                     'Green Revenue %', 'Fossil Exposure',
                     'Transition Risk', 'Risk Score (/100)',
                     'Paris Alignment', 'SBTi Target', 'Net-Zero Year',
-                    'VaR @ $130/t (S1+2)', 'VaR @ $130/t (Full-scope)',
+                    'VaR @ $130/t (Scope 1+2)', 'VaR @ $130/t (Full-scope)',
                     'Stranded Asset Signal',
                     'Data Source'
                 ],
@@ -425,7 +426,7 @@ with tab2:
                 ax2.axhline(y=100, color='gray', linestyle='--', alpha=0.4)
                 ax2.set_xticks(list(x))
                 ax2.set_xticklabels(scenarios_short, fontsize=8)
-                ax2.set_ylabel('% EBIT at risk (S1+2)', fontsize=9)
+                ax2.set_ylabel('% EBIT at risk (Scope 1+2)', fontsize=9)
                 ax2.set_title('Climate VaR by Scenario', fontsize=10, fontweight='bold')
                 ax2.legend(fontsize=8)
                 ax2.grid(alpha=0.3)
