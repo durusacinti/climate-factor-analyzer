@@ -193,30 +193,35 @@ CLIMATE RISK REPORT: XOM — Exxon Mobil Corporation
     High fossil dependency with minimal green transition.
     Material stranded asset risk under Paris-aligned carbon pricing.
 
+  TRANSITION RISK: 64.7/100  (High)
+  SBTi: No  |  Net-Zero: uncommitted
+
   EMISSIONS  (real data, ISO 14064-3 assured)
   ├─ Scope 1          :      92,000,000 tCO2e/yr
   ├─ Scope 2 (market) :       7,000,000 tCO2e/yr
-  ├─ S1+2 Intensity   :         1,423.0 tCO2e/$M revenue
+  ├─ S1+2 Intensity   :         305.6   tCO2e/$M revenue
   ├─ Scope 3 Mult     : 7.5x
   └─ Green Revenue    : 2%  |  Fossil Exposure: High
 
   PEER BENCHMARKING  (Oil & Gas, Scope 1+2 market-based)
-  ├─ Z-Score: +1.82  →  Very High relative to peers
-  │    COP    :   482.12 tCO2/$M
-  │    CVX    :   697.42 tCO2/$M
-  │    BP     :   912.37 tCO2/$M
-  │    SHEL   :  1,019.08 tCO2/$M
-  │    XOM    :  1,423.00 tCO2/$M  ◀
+  ├─ Z-Score: +1.02  →  Very High relative to peers
+  ││   CVX    :   216.62 tCO2/$M
+  │    BP     :   247.82 tCO2/$M
+  │    SHEL   :   275.40 tCO2/$M
+  │    XOM    :   305.60 tCO2/$M  ◀
+  │    COP    :   306.91 tCO2/$M
 
   PARIS ALIGNMENT
   ├─ 🔴 Paris Misaligned
   ├─ 1.5°C budget: 80 | 2°C budget: 130 tCO2/$M
-  └─ Intensity (1423.0) exceeds 2°C budget (130) by 994%. No credible pathway.
+  └─ Intensity (305.6) exceeds 2°C budget (130) by 57%. No credible pathway.
 
-  CLIMATE VaR  (% EBIT at risk)
-  Current Policy (~$15/t)            → S1+2: 8.4%   Full: 63.1%
-  IEA Net Zero 1.5°C (~$130/t)      → S1+2: 72.9%  Full: 546.6%
-  Tail Risk (~$250/t)                → S1+2: 140.2% Full: 1051.5%
+ CLIMATE VaR  (% EBIT at risk)
+  Current Policy (~$15/t)       → S1+2: 3.8%    Full: 28.7%
+  NDC Pledges (2030)            → S1+2: 11.5%   Full: 86.0%
+  Paris 2°C Pathway (2030)      → S1+2: 19.1%   Full: 143.3%
+  IEA Net Zero 1.5°C (~$130/t)  → S1+2: 33.1%   Full: 248.3%
+  Tail Risk (~$250/t)           → S1+2: 63.7%   Full: 477.6%
 
   STRANDED ASSET: HIGH — Material stranded asset risk under 1.5°C scenario
 ```
@@ -228,7 +233,7 @@ CLIMATE RISK REPORT: XOM — Exxon Mobil Corporation
 These are not caveats added for liability. They reflect genuine constraints you should understand before using this in investment analysis.
 
 **1. Emissions data is point-in-time (2023)**
-Corporate emissions change year to year. This tool uses 2023 sustainability report data and does not auto-update. For rapidly transitioning companies (e.g., a utility mid-renewable-buildout), current-year intensity may differ materially.
+Corporate emissions change year to year. This tool uses 2023 sustainability report data and does not auto-update. Revenue is fetched live from yfinance, which returns the most recent annual figure. This slightly deflates carbon intensity and Climate VaR for companies whose revenue grew between 2023 and 2024 — intensity because emissions are divided by a larger denominator, and VaR because the EBIT estimate (revenue × sector margin) grows with it. Even MSCI and Bloomberg face this lag, but intensity figures should be treated as approximate rather than precise to the decimal. None of Paris alignment labels, stranded asset signals, or Z-score rankings are meaningfully affected. All depend on relative position rather than absolute precision, and no company currently in the database crosses a threshold on the margin of this adjustment.
 
 **2. Scope 2 market-based vs. location-based**
 Market-based Scope 2 (used here for peer consistency) reflects a company's renewable energy procurement, not actual grid emissions. A tech company claiming Scope 2 = 0 via RECs may still draw significantly from a coal-heavy grid. Location-based figures are still displayed for the four tech companies where the discrepancy is most material. Market-based is used for Z-score benchmarking because switching to location-based for one company while peers report market-based under IFRS S2 would introduce more distortion than it corrects.
