@@ -10,15 +10,18 @@
 
 This climate risk tool quantifies **transition risk** the way institutional investors actually model it: as a function of a company's carbon intensity relative to its sector decarbonization pathway, the financial cost of that exposure under plausible carbon price scenarios, and the credibility of the company's transition commitments.
 
-For any ticker, the tool produces:
+*The tool accepts any yfinance-compatible ticker. US-listed companies use standard symbols (TSLA, XOM). Non-US listings require the exchange suffix: MC.PA (Euronext Paris), 7203.T (Tokyo Stock Exchange).*
+
+For a given ticker, the tool produces:
 
 - **Scope 1+2 carbon intensity** (tCO2e per $M revenue) sourced from verified company sustainability reports where available, with proxy fallback clearly labeled
-- **Peer-relative Z-score benchmarking** within sector groups (Auto, Oil & Gas, Utilities, Technology), so you see whether XOM's intensity is an outlier or industry-normal
+- **Peer-relative Z-score benchmarking** within sector groups (Auto, Oil & Gas, Utilities, Technology), so you see whether a company's intensity is an outlier or industry-normal. This is available for covered companies only; proxy-mode tickers receive sector benchmark 
+comparison instead.
 - **Paris alignment scoring** against SBTi Sectoral Decarbonization Approach budgets, distinguishing 1.5°C vs. 2°C trajectories and flagging whether commitments are verified
-- **Climate Value at Risk (Climate VaR)** across five IEA carbon price scenarios ($15–$250/tonne), expressed as percentage of EBIT at risk — separately for Scope 1+2 and full value chain (Scope 1+2+3)
-- **Stranded asset signaling** at the intersection of carbon intensity and net-zero scenario VaR
+- **Climate Value at Risk (Climate VaR)** across five IEA carbon price scenarios ($15–$250/tonne), expressed as percentage of EBIT at risk, separately for Scope 1+2 and full value chain (Scope 1+2+3)
+- **Stranded asset signaling** flags whether carbon pricing under the 1.5°C scenario would erode asset economics before end of useful life, combining carbon intensity with VaR
 - **Transition velocity** derived from capex-to-revenue trends (3-year rolling), as a proxy for revealed transition ambition vs. stated commitments
-- **Analyst classification**: Clean Pure-Play / Credible Transition Leader / Early-Stage Transition / Climate Laggard / Managed Transition
+- **Classification**: Clean Pure-Play / Credible Transition Leader / Early-Stage Transition / Climate Laggard / Managed Transitions
 
 ---
 ## Coverage
@@ -32,19 +35,24 @@ For any ticker, the tool produces:
 | Utilities | NEE, DUK, SO, D, AEP |
 | Technology | MSFT, GOOGL, AAPL, META, AMZN |
 
-For any ticker outside this set (such as major companies like LVMH or Boeing) the tool runs in **proxy 
-mode**: carbon intensity is estimated from IEA 2030 sector benchmarks adjusted by industry factor and green revenue fraction. Proxy mode results are clearly labeled in the UI and should be treated as directional, not precise.
+For any ticker outside this set (e.g. LVMH, Boeing) the tool runs in **proxy mode**: carbon intensity is estimated from IEA 2030 sector benchmarks adjusted by industry factor and green revenue fraction. Proxy mode results are clearly labeled in the UI and should be treated as directional, not precise.
 
-Proxy mode still produces Paris alignment scoring, Climate VaR, and  transition risk classification, but without verified emissions data or named peer benchmarking.
-
-**Planned expansion:** Aviation and steel, mining, and financial services 
-(financed emissions via PCAF methodology), given availability of free access to a
+Proxy mode still produces Paris alignment scoring, Climate VaR, stranded asset signaling, and transition risk classification, but without verified emissions data or named peer benchmarking.
 
 ## Methodology
 
 TCFD was disbanded in October 2023. Its recommendations were fully absorbed into **IFRS S2 (ISSB)**, which became the mandatory climate disclosure standard effective January 2024 and has been adopted by major institutional investors for climate-related financial risk reporting.
 
 This tool is built on IFRS S2 methodology.
+
+IFRS S2 requires disclosure across four areas: Governance, Strategy, Risk Management, and Metrics & Targets. This tool applies the **Strategy** and **Metrics & Targets** pillars by modelling transition risk under carbon price scenarios and assessing Paris alignment against science-based decarbonization budgets.
+
+IFRS S2 distinguishes two climate risk types:
+
+**Transition Risk**: Financial exposure from the shift to a low-carbon economy: carbon pricing, stranded assets, regulatory tightening, technology disruption. This is what the tool currently models.
+
+**Physical Risk**: Asset exposure from climate change itself, either acute or chronic: 
+extreme weather, water stress, supply chain disruption. Not yet modeled (see Limitations).
 
 > Reference: [IFRS Foundation — TCFD Transition to ISSB](https://www.ifrs.org/sustainability/tcfd/)
 
@@ -60,7 +68,7 @@ For companies in the emissions database, Scope 1+2 intensity is calculated direc
 Intensity (tCO2e/$M) = (Scope 1 + Scope 2_market-based) / Annual Revenue ($M)
 ```
 
-Scope 2 uses the **market-based method** consistently across all peers (the standard for IFRS S2 disclosure). Tech companies with verified 100% renewable matching (RECs/PPAs) report Scope 2 = 0 under this method — this is intentional and correct. Location-based Scope 2 is stored separately and displayed for transparency.
+Scope 2 uses the **market-based method** consistently across all peers (the standard for IFRS S2 disclosure). Tech companies with verified 100% renewable matching (RECs/PPAs) report Scope 2 = 0 under this method. This is intentional and correct. Location-based Scope 2 is stored separately and displayed for transparency.
 
 The Z-score compares a company's intensity against its sector peer group mean and standard deviation:
 
@@ -223,29 +231,47 @@ These are not caveats added for liability. They reflect genuine constraints you 
 Corporate emissions change year to year. This tool uses 2023 sustainability report data and does not auto-update. For rapidly transitioning companies (e.g., a utility mid-renewable-buildout), current-year intensity may differ materially.
 
 **2. Scope 2 market-based vs. location-based**
-Market-based Scope 2 (used here for peer consistency) reflects a company's renewable energy procurement, not actual grid emissions. A tech company claiming Scope 2 = 0 via RECs may still draw significantly from a coal-heavy grid. Location-based figures are stored separately and displayed where available.
+Market-based Scope 2 (used here for peer consistency) reflects a company's renewable energy procurement, not actual grid emissions. A tech company claiming Scope 2 = 0 via RECs may still draw significantly from a coal-heavy grid. Location-based figures are still displayed for the four tech companies where the discrepancy is most material. Market-based is used for Z-score benchmarking because switching to location-based for one company while peers report market-based under IFRS S2 would introduce more distortion than it corrects.
 
 **3. Scope 3 multipliers are sector-level proxies**
 CDP 2023 multipliers are applied at the sector level. Company-specific Scope 3 (particularly Category 11 — use of sold products) varies enormously within sectors. Toyota's Scope 3 is ~60x its Scope 1+2; Tesla's is ~2x. Where this diverges from the sector proxy, the full-scope VaR figures should be treated as indicative, not precise.
 
 **4. Revenue-based intensity denominator**
-Carbon intensity per revenue ($M) is not the only valid metric. Intensity per unit of output (e.g., tCO2/MWh for utilities, tCO2/vehicle for auto) is more operationally meaningful but requires production data not available via public APIs. Revenue-based intensity is appropriate for cross-sector comparison and IFRS S2 disclosure benchmarking.
+Carbon intensity per revenue ($M) is not the only valid metric. Intensity per unit of output (e.g., tCO2/MWh for utilities, tCO2/vehicle for auto) is more useful for understanding actual operations but requires production data not available via public APIs. Revenue-based intensity is appropriate for cross-sector comparison and IFRS S2 disclosure benchmarking.
 
 **5. Transition velocity is a capex proxy**
 Capex-to-revenue trends from yfinance financials are used as a signal, not a direct measure of green investment. Companies may increase capex for non-climate reasons (M&A, maintenance). A 'Slowing' velocity signal should prompt further review, not be read as definitive.
 
-**6. Universe coverage**
-The emissions database covers 20 companies across four sectors. For tickers outside this universe, the tool falls back to IEA sector benchmarks adjusted by industry factor — these are materially less precise than verified company data.
+**6. Coverage**
+The emissions database covers 20 companies across four sectors. For tickers outside this universe, the tool falls back to IEA sector benchmarks adjusted by industry factor, which are materially less precise than verified company data.
 
+**7. Physical risk layer**
+For the covered sectors, transition risk is the primary driver of climate-related financial risk in IEA transition scenarios. Physical risk modeling requires company-level geographic asset exposure data not available via free public APIs. Flagged for future development.
 ---
 
 ## What's Next
 
-- [ ] **AI natural language interface** — conversational stock comparison using Claude API; ask "Compare NEE and DUK on transition risk" and get a structured analyst-style response
-- [ ] **2024/2025 emissions refresh** — update verified Scope 1+2 figures as companies publish new sustainability reports; track year-over-year intensity changes
-- [ ] **Historical SBTi glide path** — plot a company's multi-year intensity trajectory against its 1.5°C and 2°C decarbonization budget, making convergence or divergence visible
-- [ ] **Expanded database** — Industrials (GE, HON, CAT), REITs, and Financial Services; financial sector Scope 3 (financed emissions) is analytically distinct and requires PCAF methodology
-- [ ] **Dashboard visualizations** — peer comparison radar charts, VaR waterfall by scenario, sector heatmap
+- [ ] **2024/2025 emissions refresh**: Updating verified Scope 1+2
+  figures as companies publish new sustainability reports; tracking
+  year-over-year intensity changes against SBTi glide paths
+
+- [ ] **Industry expansion**: Aviation, steel, cement, and heavy
+  machinery (GE, HON, CAT) are among the most carbon-intensive
+  industries and face the steepest decarbonization cost curves under
+  any Paris-aligned scenario, making transition risk analysis most
+  consequential here. Financial services faces transition risk 
+  indirectly through financed emissions (Scope 3 Category 15), 
+  which is analytically distinct from operational emissions and 
+  requires PCAF methodology.
+
+- [ ] **Mid-cap and emerging market expansion**: Large caps are already
+  well-served by MSCI, Sustainalytics, and Bloomberg ESG. The coverage
+  gap is most acute in mid-cap and emerging market companies, where
+  climate risk is often higher but third-party ESG coverage is scarcer.
+  Contributions and data suggestions welcome.
+
+- [ ] **Dashboard visualizations**: Peer comparison radar charts, VaR
+  waterfall by scenario, sector heatmap
 
 ---
 

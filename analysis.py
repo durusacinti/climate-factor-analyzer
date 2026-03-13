@@ -599,11 +599,22 @@ def _get_revenue_millions(ticker: str):
     """
     Fetch annual revenue in $M from yfinance.
     yfinance totalRevenue is in raw dollars — divide by 1,000,000 for $M.
+
+    Note: yfinance has a known bug where Japanese tickers (e.g. TM) return revenue
+    in JPY but mislabel the currency as USD. Values above 5 trillion are treated as
+    JPY and converted using a live USD/JPY rate fetch with 150 as fallback.
     """
     try:
         info = yf.Ticker(ticker).info
         rev = info.get('totalRevenue')
         if rev and rev > 0:
+            if rev > 5_000_000_000_000:
+                try:
+                    fx = yf.Ticker('USDJPY=X').info.get('regularMarketPrice', 150)
+                    usd_jpy = fx if fx and fx > 100 else 150
+                except Exception:
+                    usd_jpy = 150
+                rev = rev / usd_jpy
             return rev / 1_000_000  # raw dollars → $M
     except Exception:
         pass
