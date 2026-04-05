@@ -80,7 +80,7 @@ with tab1:
                 icon = cls_icon(f['classification'])
                 st.markdown(f"## {icon} {f['company']} ({f['ticker']})")
                 st.markdown(f"**{f['sector']}** · {f['industry']}")
-                st.markdown(f"*{f['classification_note']}*")
+                st.markdown(f"*{f['classification_note'].split('S1+2 intensity appears low')[0].strip()}*")
             with col_h2:
                 badge_cls, badge_lbl = paris_badge(f['paris_alignment']['status'])
                 st.markdown(f"<br><span class='risk-badge {badge_cls}'>{badge_lbl}</span>",
@@ -93,26 +93,30 @@ with tab1:
 
             # ── Row 1: Key metrics ────────────────────────────────────────────
             st.subheader("📊 Key Climate Metrics")
-            m1, m2, m3, m4, m5 = st.columns(5)
+            m1, m2, m3, m4, m5, m6 = st.columns(6)
             m1.metric("Scope 1+2 Intensity",
                       f"{f['intensity_s12']:.1f} tCO2/$M",
                       help="Scope 1+2 carbon intensity per $M revenue. Lower = less carbon per dollar earned.")
-            m2.metric("Green Revenue", f"{f['green_revenue_pct']}%",
+            m2.metric("Full-Scope Intensity",
+                      f"{f['intensity_s12'] * f['scope3_multiplier']:.1f} tCO2/$M",
+                      help="Scope 1+2 × Scope 3 multiplier. Captures full value-chain lifecycle exposure.")
+            m2.caption("Scope 1+2 × Scope 3 multiplier")
+            m3.metric("Green Revenue", f"{f['green_revenue_pct']}%",
                       help="% of revenue from clean/low-carbon products or services.")
-            m3.metric("Fossil Exposure", f['fossil_exposure'])
-            m4.metric("Transition Risk", f['transition_risk_label'],
+            m4.metric("Fossil Exposure", f['fossil_exposure'])
+            m5.metric("Transition Risk", f['transition_risk_label'],
                       help="Composite 0-100 score based on intensity, green revenue, Paris alignment, and SBTi commitment.")
             _nz_status = f.get('net_zero_status', 'Unknown')
             if _nz_status == 'None declared':
-                m5.metric("Net-Zero Target", "No target declared",
+                m6.metric("Net-Zero Target", "No target declared",
                           help="Company has explicitly stated no net-zero target.")
-                m5.markdown("<p style='color:#ef4444;font-size:0.75rem;margin-top:-10px;'>⚠️ No commitment</p>",
+                m6.markdown("<p style='color:#ef4444;font-size:0.75rem;margin-top:-10px;'>⚠️ No commitment</p>",
                             unsafe_allow_html=True)
             elif _nz_status == 'Unknown':
-                m5.metric("Net-Zero Target", "Not disclosed",
+                m6.metric("Net-Zero Target", "Not disclosed",
                           help="No net-zero target information available for this company.")
             else:
-                m5.metric("Net-Zero Target", _nz_status,
+                m6.metric("Net-Zero Target", _nz_status,
                           help="Company-stated net-zero target year.")
 
             st.markdown("---")
@@ -332,14 +336,14 @@ with tab2:
             with ca:
                 st.markdown(f"### {cls_icon(fa['classification'])} {fa['ticker']} — {fa['company']}")
                 st.write(f"**{fa['classification']}**")
-                st.caption(fa['classification_note'])
+                st.caption(fa['classification_note'].split('S1+2 intensity appears low')[0].strip())
                 badge_cls, badge_lbl = paris_badge(fa['paris_alignment']['status'])
                 st.markdown(f"<span class='risk-badge {badge_cls}'>{badge_lbl}</span>",
                             unsafe_allow_html=True)
             with cb:
                 st.markdown(f"### {cls_icon(fb['classification'])} {fb['ticker']} — {fb['company']}")
                 st.write(f"**{fb['classification']}**")
-                st.caption(fb['classification_note'])
+                st.caption(fb['classification_note'].split('S1+2 intensity appears low')[0].strip())
                 badge_cls, badge_lbl = paris_badge(fb['paris_alignment']['status'])
                 st.markdown(f"<span class='risk-badge {badge_cls}'>{badge_lbl}</span>",
                             unsafe_allow_html=True)
