@@ -93,30 +93,26 @@ with tab1:
 
             # ── Row 1: Key metrics ────────────────────────────────────────────
             st.subheader("📊 Key Climate Metrics")
-            m1, m2, m3, m4, m5, m6 = st.columns(6)
+            m1, m2, m3, m4, m5 = st.columns(5)
             m1.metric("Scope 1+2 Intensity",
                       f"{f['intensity_s12']:.1f} tCO2/$M",
                       help="Scope 1+2 carbon intensity per $M revenue. Lower = less carbon per dollar earned.")
-            m2.metric("Full-Scope Intensity",
-                      f"{f['intensity_s12'] * f['scope3_multiplier']:.1f} tCO2/$M",
-                      help="Scope 1+2 × Scope 3 multiplier. Captures full value-chain lifecycle exposure.")
-
-            m3.metric("Green Revenue", f"{f['green_revenue_pct']}%",
+            m2.metric("Green Revenue", f"{f['green_revenue_pct']}%",
                       help="% of revenue from clean/low-carbon products or services.")
-            m4.metric("Fossil Exposure", f['fossil_exposure'])
-            m5.metric("Transition Risk", f['transition_risk_label'],
+            m3.metric("Fossil Exposure", f['fossil_exposure'])
+            m4.metric("Transition Risk", f['transition_risk_label'],
                       help="Composite 0-100 score based on intensity, green revenue, Paris alignment, and SBTi commitment.")
             _nz_status = f.get('net_zero_status', 'Unknown')
             if _nz_status == 'None declared':
-                m6.metric("Net-Zero Target", "No target declared",
+                m5.metric("Net-Zero Target", "No target declared",
                           help="Company has explicitly stated no net-zero target.")
-                m6.markdown("<p style='color:#ef4444;font-size:0.75rem;margin-top:-10px;'>⚠️ No commitment</p>",
+                m5.markdown("<p style='color:#ef4444;font-size:0.75rem;margin-top:-10px;'>⚠️ No commitment</p>",
                             unsafe_allow_html=True)
             elif _nz_status == 'Unknown':
-                m6.metric("Net-Zero Target", "Not disclosed",
+                m5.metric("Net-Zero Target", "Not disclosed",
                           help="No net-zero target information available for this company.")
             else:
-                m6.metric("Net-Zero Target", _nz_status,
+                m5.metric("Net-Zero Target", _nz_status,
                           help="Company-stated net-zero target year.")
 
             st.markdown("---")
@@ -131,12 +127,13 @@ with tab1:
 
                 if f['scope1_tonnes']:
                     em_data = {
-                        'Metric': ['Scope 1', 'Scope 2 (market-based)', 'Scope 1+2 Total', 'Scope 1+2 Intensity'],
+                        'Metric': ['Scope 1', 'Scope 2 (market-based)', 'Scope 1+2 Total', 'Scope 1+2 Intensity', 'Full-Scope Intensity (est.)'],
                         'Value': [
                             f"{f['scope1_tonnes']:,.0f} tCO2e",
                             f"{f['scope2_tonnes']:,.0f} tCO2e",
                             f"{f['scope1_tonnes'] + f['scope2_tonnes']:,.0f} tCO2e",
                             f"{f['intensity_s12']:.2f} tCO2/$M revenue",
+                            f"{f['intensity_s12'] * f['scope3_multiplier']:.1f} tCO2/$M (Scope 3 multiplier: {f['scope3_multiplier']}x)",
                         ]
                     }
                     if f.get('scope2_location_based'):
