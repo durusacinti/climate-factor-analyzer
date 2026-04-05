@@ -853,7 +853,7 @@ def calculate_climate_factors(ticker: str) -> dict:
 
     paris = check_paris_alignment(intensity_s12, sector_group, has_sbti, nz_year, industry)
 
-    # Use actual SBTi paris status (computed from real intensity_s12, not heuristic estimate)
+    # Use actual SBTi Paris status (computed from real intensity_s12, not heuristic estimate)
     paris_aligned_profile = paris['status'] in (
         '1.5C Aligned', '2C Aligned', '1.5C Consistent (unverified)', 'Potentially 2C Aligned'
     )
@@ -863,7 +863,7 @@ def calculate_climate_factors(ticker: str) -> dict:
     else:
         peer_comparison = climate_profile['peer_comparison']
 
-    # _transition_risk_score uses z_score, intensity, green_rev, SBTi, and paris together.
+    # _transition_risk_score uses z_score, intensity, green_rev, SBTi, and Paris together.
     # Previously a dead 8-cell matrix was used here — this activates the proper scorer.
     risk_score, risk_label = _transition_risk_score(
         z_score, intensity_s12, green_rev, has_sbti, paris['status']
@@ -899,19 +899,32 @@ def calculate_climate_factors(ticker: str) -> dict:
     elif nz_var > 10:                           stranded = 'LOW-MEDIUM — Some asset repricing risk under aggressive scenarios'
     else:                                       stranded = 'LOW — Limited stranded asset exposure'
 
-    # Analyst classification
-    if green_rev > 80 and intensity_s12 < 20:
+    # uses full lifecycle intensity (S1+2 × Scope 3 multiplier)
+    # to capture value-chain exposure (e.g. auto Cat 11 use-phase, O&G combustion emissions).
+    # All other metrics (z-scores, Paris alignment, Climate VaR, stranded asset) use
+    # intensity_s12 only for peer comparability.
+    full_intensity = intensity_s12 * scope3_mult
+
+    if green_rev > 80 and full_intensity < 20:
         cls, cls_note = 'Clean Pure-Play', 'Revenue predominantly from low-carbon products. Net beneficiary of carbon pricing.'
-    elif green_rev > 50 and intensity_s12 > 50:
+    elif green_rev > 50 and full_intensity > 50:
         cls, cls_note = 'Credible Transition Leader', 'Significant green revenue offsetting legacy high-carbon assets.'
-    elif green_rev > 20 and intensity_s12 > 50:
+    elif green_rev > 20 and full_intensity > 50:
         cls, cls_note = 'Early-Stage Transition', 'Green revenues emerging but legacy carbon exposure still dominant. Execution risk elevated.'
-    elif intensity_s12 > 150 and green_rev < 10:
-        cls, cls_note = 'Climate Laggard', 'High fossil dependency with minimal green transition. Material stranded asset risk under Paris-aligned carbon pricing.'
+    elif full_intensity > 150 and green_rev < 25:
+        cls, cls_note = 'Climate Laggard', 'High fossil dependency with limited green transition. Material stranded asset risk under Paris-aligned carbon pricing.'
+    elif full_intensity > 50 and paris['status'] in ['Paris Misaligned', 'Committed, Off Track']:
+        cls, cls_note = 'Early-Stage Transition', 'Legacy carbon exposure with no credible near-term decarbonization pathway. Execution risk elevated.'
     elif has_sbti and paris['status'] in ['2C Aligned', '1.5C Aligned', '1.5C Consistent (unverified)']:
         cls, cls_note = 'Managed Transition', 'Moderate carbon exposure with credible decarbonization commitment and trajectory.'
     else:
         cls, cls_note = 'Standard — Monitor', 'Risk profile typical for sector. No exceptional leadership or laggard identified.'
+
+    if scope3_mult > 1.5:
+        cls_note += (
+            f' S1+2 intensity appears low; full-scope intensity (incl. Scope 3) is {scope3_mult:.0f}×'
+            ' higher. Classification reflects lifecycle exposure.'
+        )
 
     # status_note ← generated from profile fields
     status_note = (
