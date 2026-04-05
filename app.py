@@ -100,7 +100,7 @@ with tab1:
             m2.metric("Full-Scope Intensity",
                       f"{f['intensity_s12'] * f['scope3_multiplier']:.1f} tCO2/$M",
                       help="Scope 1+2 × Scope 3 multiplier. Captures full value-chain lifecycle exposure.")
-            m2.caption("Scope 1+2 × Scope 3 multiplier")
+
             m3.metric("Green Revenue", f"{f['green_revenue_pct']}%",
                       help="% of revenue from clean/low-carbon products or services.")
             m4.metric("Fossil Exposure", f['fossil_exposure'])

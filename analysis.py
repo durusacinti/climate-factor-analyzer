@@ -917,6 +917,8 @@ def calculate_climate_factors(ticker: str) -> dict:
         cls, cls_note = 'Early-Stage Transition', 'Legacy carbon exposure with no credible near-term decarbonization pathway. Execution risk elevated.'
     elif has_sbti and paris['status'] in ['2C Aligned', '1.5C Aligned', '1.5C Consistent (unverified)']:
         cls, cls_note = 'Managed Transition', 'Moderate carbon exposure with credible decarbonization commitment and trajectory.'
+    elif full_intensity > 500:
+        cls, cls_note = 'Climate Laggard', 'Exceptionally high full-scope intensity. Material value-chain emissions exposure regardless of green revenue share.'
     else:
         cls, cls_note = 'Standard — Monitor', 'Risk profile typical for sector. No exceptional leadership or laggard identified.'
 
