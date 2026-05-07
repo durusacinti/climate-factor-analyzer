@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from analysis import calculate_climate_factors
 
+@st.cache_data(ttl=3600)
+def cached_climate_factors(ticker):
+    return calculate_climate_factors(ticker)
+
 st.set_page_config(page_title="Climate Factor Analyzer", page_icon="🌍", layout="wide")
 
 # ── Styling ──────────────────────────────────────────────────────────────────
@@ -72,7 +76,7 @@ with tab1:
     if ticker_input:
         try:
             with st.spinner("Analyzing climate risk..."):
-                f = calculate_climate_factors(ticker_input.upper())
+                f = cached_climate_factors(ticker_input.upper())
 
             # ── Company header ────────────────────────────────────────────────
             col_h1, col_h2 = st.columns([3, 1])
@@ -280,8 +284,12 @@ with tab1:
                 st.success(f"🏚️ Stranded Asset Signal: {stranded}")
 
         except Exception as e:
-            st.error(f"❌ Error analyzing {ticker_input}: {str(e)}")
-            st.write("Please check the ticker symbol and try again.")
+            _err = str(e).lower()
+            if any(s in _err for s in ['rate limit', 'too many requests', '429', 'yfratelimit']):
+                st.error("Yahoo Finance is temporarily rate-limited. Please wait 30 seconds and try again.")
+            else:
+                st.error(f"❌ Error analyzing {ticker_input}: {str(e)}")
+                st.write("Please check the ticker symbol and try again.")
 
     # ── Sidebar ───────────────────────────────────────────────────────────────
     with st.sidebar:
@@ -325,8 +333,8 @@ with tab2:
     if st.button("🔍 Compare Climate Risk"):
         try:
             with st.spinner("Analyzing..."):
-                fa = calculate_climate_factors(ticker_a.upper())
-                fb = calculate_climate_factors(ticker_b.upper())
+                fa = cached_climate_factors(ticker_a.upper())
+                fb = cached_climate_factors(ticker_b.upper())
 
             # ── Side-by-side classification ───────────────────────────────────
             ca, cb = st.columns(2)
@@ -451,4 +459,8 @@ with tab2:
             )
 
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+            _err = str(e).lower()
+            if any(s in _err for s in ['rate limit', 'too many requests', '429', 'yfratelimit']):
+                st.error("Yahoo Finance is temporarily rate-limited. Please wait 30 seconds and try again.")
+            else:
+                st.error(f"❌ Error: {str(e)}")

@@ -25,6 +25,7 @@ Author: Duru Sacinti | UC Berkeley Environmental Economics + Data Science Alumna
 """
 
 import os
+import time
 import logging
 import numpy as np
 import pandas as pd
@@ -604,20 +605,24 @@ def _get_revenue_millions(ticker: str):
     in JPY but mislabel the currency as USD. Values above 5 trillion are treated as
     JPY and converted using a live USD/JPY rate fetch with 150 as fallback.
     """
-    try:
-        info = yf.Ticker(ticker).info
-        rev = info.get('totalRevenue')
-        if rev and rev > 0:
-            if rev > 5_000_000_000_000:
-                try:
-                    fx = yf.Ticker('USDJPY=X').info.get('regularMarketPrice', 150)
-                    usd_jpy = fx if fx and fx > 100 else 150
-                except Exception:
-                    usd_jpy = 150
-                rev = rev / usd_jpy
-            return rev / 1_000_000  # raw dollars → $M
-    except Exception:
-        pass
+    for attempt in range(3):
+        try:
+            info = yf.Ticker(ticker).info
+            rev = info.get('totalRevenue')
+            if rev and rev > 0:
+                if rev > 5_000_000_000_000:
+                    try:
+                        fx = yf.Ticker('USDJPY=X').info.get('regularMarketPrice', 150)
+                        usd_jpy = fx if fx and fx > 100 else 150
+                    except Exception:
+                        usd_jpy = 150
+                    rev = rev / usd_jpy
+                return rev / 1_000_000  # raw dollars → $M
+        except Exception as e:
+            if attempt < 2 and any(s in str(e).lower() for s in ['rate limit', 'too many requests', '429']):
+                time.sleep(2 ** attempt)
+            else:
+                break
     return None
 
 
